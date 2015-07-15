@@ -15,6 +15,11 @@ trait MappableTrait {
     protected $attributes = [];
 
     /**
+     * @var EntityMap
+     */
+    protected $EntityMap = null;
+
+    /**
      * Method used by the mapper to set the object 
      * attribute raw values (hydration)
      * 
@@ -67,5 +72,19 @@ trait MappableTrait {
         }
         else return null;
     }
-   
+
+
+    public function setEntityMap(EntityMap $map)
+    {
+        $this->EntityMap = $map;
+    }
+
+    /**
+     * @return EntityMap
+     */
+    public function getEntityMap()
+    {
+        return $this->EntityMap;
+    }
+
 }

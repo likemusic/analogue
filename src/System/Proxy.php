@@ -1,6 +1,7 @@
 <?php namespace Analogue\ORM\System;
 
 use Analogue\ORM\Mappable;
+use Analogue\ORM\Relationships\Relationship;
 
 abstract class Proxy implements ProxyInterface{
 
@@ -10,6 +11,11 @@ abstract class Proxy implements ProxyInterface{
 	 * @var string
 	 */
 	protected $relation;
+
+    /**
+     * @var Relationship
+     */
+    protected $relatiionObject;
 
 	/**
 	 * Reference to parent entity object
@@ -28,10 +34,11 @@ abstract class Proxy implements ProxyInterface{
 	/**
 	 * @param string $relation 	relationship method handled by the proxy.
 	 */
-	public function __construct(Mappable $parentEntity, $relation)
+	public function __construct(Mappable $parentEntity, $relation, Relationship $relationObject)
 	{
 		$this->entity = $parentEntity;
 		$this->relation = $relation;
+        $this->relatiionObject = $relationObject;
 	}
 
 	/**
@@ -41,8 +48,9 @@ abstract class Proxy implements ProxyInterface{
 	 */
 	public function load()
 	{
-		$entities = $this->query($this->entity, $this->relation)->getResults($this->relation);
-		
+		//$entities = $this->query($this->entity, $this->relation)->getResults($this->relation);
+        $entities = $this->relatiionObject->getResults($this->relation);
+
 		$this->loaded = true;
 
 		return $entities;

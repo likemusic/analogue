@@ -42,9 +42,9 @@ class EntityBuilder {
 
         $this->eagerLoads = $eagerLoads;
 
-        $this->lazyLoads = $this->prepareLazyLoading();
+        //$this->lazyLoads = $this->prepareLazyLoading();
 
-        $this->entityMap = $mapper->getEntityMap();
+        //$this->entityMap = $mapper->getEntityMap();
     }
 
     /**
@@ -77,12 +77,15 @@ class EntityBuilder {
             $instance->setEntityAttributes($resultArray);
 
             // Hydrate relation attributes with lazyloading proxies
-            if(count($this->lazyLoads) > 0)
+            /*if(count($this->lazyLoads) > 0)
             {
                 $proxies = $this->getLazyLoadingProxies($instance);
                 $instance->setEntityAttributes($resultArray + $proxies);
-            }
+            }*/
 
+            //All realation except EagleLoaded lazyloading
+            //inject mapper for detect access to lazy load relation
+            $instance->setEntityMap($this->entityMap);
             $entities[] = $instance;
         }
 

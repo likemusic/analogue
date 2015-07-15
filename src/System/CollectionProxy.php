@@ -26,10 +26,10 @@ class CollectionProxy extends Proxy implements ArrayAccess, Arrayable, Countable
 	/**
 	 * @param string $relation 	relationship method handled by the proxy.
 	 */
-	public function __construct(Mappable $parentEntity, $relation)
+	public function __construct(Mappable $parentEntity, $relation, $relationObject )
 	{
 		$this->addedItems = new EntityCollection;
-		parent::__construct($parentEntity, $relation);
+		parent::__construct($parentEntity, $relation, $relationObject);
 	}
 
 	public function add(Mappable $entity)

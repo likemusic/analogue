@@ -24,21 +24,30 @@ class Entity extends ValueObject implements Mappable, ArrayAccess, Jsonable, Jso
 	 */
 	public function __get($key)
 	{
-		if (! array_key_exists($key, $this->attributes))
-		{
-			return null;
-		}
 		if ($this->hasGetMutator($key))
 		{
 			$method = 'get'.$this->getMutatorMethod($key);
 
 			return $this->$method($this->attributes[$key]);
 		}
-		if ($this->attributes[$key] instanceof EntityProxy)
+
+        /*if ($this->attributes[$key] instanceof EntityProxy)
 		{
 			$this->attributes[$key] = $this->attributes[$key]->load();
+		}*/
+        //Load relations by injected mapper
+        if ( array_key_exists($key, $this->attributes))
+        {
+            return $this->attributes[$key];
+        }
+
+        if ($relation = $this->getEntityMap()->getRelation($key,$this))
+        {
+            $this->attributes[$key] = $relation;
+            return $relation;
 		}
-		return $this->attributes[$key];
+
+        return null;
 	}
 
 	/**
@@ -113,4 +122,23 @@ class Entity extends ValueObject implements Mappable, ArrayAccess, Jsonable, Jso
 		return $attributes;
 	}
 
+    public function __call($method, $parameters)
+    {
+        $innerParams = array_merge(array($method, $this),$parameters);//TODO: may be just + operatоr?
+        return  call_user_func_array(array($this->EntityMap, 'getRelation'),  $innerParams);
+
+        //TODO: add validation and throw exception
+        /*
+        $this->EntityMap->getRelation($method,$this,)
+        if(! array_key_exists($method, $this->dynamicRelationships))
+        {
+            throw new Exception(get_class($this)." has no method $method");
+        }
+
+        // Add $this to parameters so the closure can call relationship method on the map.
+        $parameters[] = $this;
+
+        return  call_user_func_array(array($this->dynamicRelationships[$method], $parameters));
+        */
+    }
 }

@@ -1,5 +1,8 @@
 <?php namespace Analogue\ORM;
 
+use Analogue\ORM\Relationships\Relationship;
+use Analogue\ORM\System\CollectionProxy;
+use Analogue\ORM\System\EntityProxy;
 use Exception;
 use Analogue\ORM\System\Manager;
 use Analogue\ORM\System\Mapper;
@@ -165,7 +168,15 @@ class EntityMap {
 	 */
 	private $manager;
 
-	/**
+    protected $manyClasses = ['BelongsToMany', 'HasMany', 'HasManyThrough',
+        'MorphMany', 'MorphToMany'];
+
+
+    protected $singleClasses = ['BelongsTo', 'HasOne', 'MorphOne','MorphTo'];
+
+
+
+    /**
 	 * Set the Manager that will be used for relationship's mapper instantiations.
 	 * 
 	 * @param Manager $manager 
@@ -925,4 +936,44 @@ class EntityMap {
 
 		return  call_user_func_array(array($this->dynamicRelationships[$method], $parameters));
 	}
+
+    /**
+     * @param string $relation
+     * @param Entity $masterEntity
+     * @return Mappable|CollectionProxy|System\EntityCollection|EntityProxy|null
+     */
+    function getRelation( $relation, Entity $masterEntity)
+    {
+        $args_count =  func_num_args();
+        if($args_count < 2) throw new Exception("GetRelation must have 2 or more parameters!");
+
+        $args =  func_get_args();
+        $relation = array_shift($args);
+        //if(! $relation instanceof Relationship) throw new Exception("First param must be instance of Relationship!");
+        if(! is_string($relation)) throw new Exception("First param must be string with name of Relationship!");
+
+        $parameters = $args;
+        $masterEntity = array_shift($args);
+        //TODO: refactor
+        if(!in_array($relation,$this->relationships))  throw new Exception('Invalid function or member call!');
+
+        //$relationObject = $this->$relation($masterEntity);
+        $relationObject = call_user_func_array(array($this,$relation) , $parameters);
+        $class = class_basename(get_class($relationObject));
+
+        if (in_array($class, $this->singleClasses))
+        {
+            $tmp = new EntityProxy($masterEntity, $relation, $relationObject);
+            return $tmp->load();
+        }
+
+        if (in_array($class, $this->manyClasses))
+        {
+            $tmp = new CollectionProxy($masterEntity, $relation, $relationObject);
+            //return $tmp->load();
+            return $tmp;
+        }
+
+        return null;
+    }
 }

@@ -30,4 +30,13 @@ interface Mappable {
      */
     public function getEntityAttribute($key);
 
+    /**
+     * @param EntityMap $map
+     */
+    public function setEntityMap(EntityMap $map);
+
+    /**
+     * @return EntityMap
+     */
+    public function getEntityMap();
 }
