@@ -29,6 +29,8 @@ function get_analogue()
         'prefix'   => '',
     ];
 
+    //$Container = new Illuminate\Contracts\Container\Container;
+
 
     $analogue = new Analogue\ORM\Analogue($testDb);
 

@@ -48,7 +48,7 @@ class AnalogueServiceProvider extends ServiceProvider {
 
 			$event = $app->make('events');
 
-			return new Manager($driverManager, $event);
+			return new Manager($driverManager, $event, $this->app);
 		});
 	}
 	

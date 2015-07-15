@@ -1,6 +1,7 @@
 <?php namespace Analogue\ORM;
 
 use Analogue\ORM\System\Manager;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Analogue\ORM\Drivers\Manager as DriverManager;
@@ -21,8 +22,15 @@ class Analogue {
 
     protected static $booted = false;
 
-    public function __construct(array $connection)
+    /**
+     * @var Container
+     */
+    protected $container;
+
+    public function __construct(array $connection, Container $container)
     {
+        $this->container = $container;
+
         if(! static::$booted)
         {
             static::$capsule = new Capsule;
@@ -55,7 +63,7 @@ class Analogue {
 
         $driverManager->addDriver($illuminate);
 
-        static::$manager = new Manager($driverManager, $dispatcher);
+        static::$manager = new Manager($driverManager, $dispatcher, $this->container);
         
         static::$instance = $this;
 

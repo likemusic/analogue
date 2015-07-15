@@ -1,6 +1,7 @@
 <?php namespace Analogue\ORM\System;
 
 use Analogue\ORM\EntityMap;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Analogue\ORM\Drivers\Manager as DriverManager;
 
@@ -32,13 +33,20 @@ class MapperFactory {
      */
     protected $dispatcher;
 
-    public function __construct(DriverManager $drivers, Dispatcher $dispatcher, Manager $manager)
+    /**
+     * @var Container
+     */
+    protected $container;
+
+    public function __construct(DriverManager $drivers, Dispatcher $dispatcher, Manager $manager, Container $container)
     {
         $this->drivers = $drivers;
 
         $this->dispatcher = $dispatcher;
 
         $this->manager = $manager;
+
+        $this->container = $container;
     }
 
     /**
@@ -56,7 +64,7 @@ class MapperFactory {
         $adapter = $this->drivers->getAdapter($driver, $connection);
         $entityMap->setDateFormat($adapter->getDateFormat());
 
-        $mapper = new Mapper($entityMap, $adapter, $this->dispatcher, $this->manager);
+        $mapper = new Mapper($entityMap, $adapter, $this->dispatcher, $this->manager, $this->container);
 
         // Fire Initializing Event
         $mapper->fireEvent('initializing', $mapper);

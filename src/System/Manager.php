@@ -8,6 +8,7 @@ use Analogue\ORM\System\Mapper;
 use Analogue\ORM\Drivers\Manager as DriverManager;
 use Analogue\ORM\Exceptions\MappingException;
 use Analogue\ORM\Plugins\AnaloguePluginInterface;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 
 /**
@@ -72,15 +73,22 @@ class Manager {
 	protected $events = ['initializing', 'initialized', 'store', 'stored',
 		'creating', 'created', 'updating', 'updated', 'deleting', 'deleted' ];
 
-	/**
+    /**
+     * @var Container
+     */
+    protected $container;
+
+    /**
 	 * @param \Analogue\ORM\Drivers\Manager $driverManager       
 	 * @param Dispatcher $event 
 	 */
-	public function __construct(DriverManager $driverManager, Dispatcher $event)
+	public function __construct(DriverManager $driverManager, Dispatcher $event, Container $container)
 	{
 		$this->drivers = $driverManager;
 
 		$this->eventDispatcher = $event;
+
+        $this->container = $container;
 
 		static::$instance = $this;
 	}
@@ -109,7 +117,7 @@ class Manager {
 
 		$entityMap = $this->entityClasses[$entity];
 
-		$factory = new MapperFactory($this->drivers, $this->eventDispatcher, $this);
+		$factory = new MapperFactory($this->drivers, $this->eventDispatcher, $this, $this->container);
 
 		$this->mappers[$entity] = $factory->make($entity, $entityMap);
 

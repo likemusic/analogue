@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Analogue\ORM\Commands\Command;
 use Analogue\ORM\Drivers\DBAdapter;
 use Analogue\ORM\Exceptions\MappingException;
+use Illuminate\Contracts\Container\Container;
 
 /*
  * The mapper provide all the interactions with the database layer
@@ -74,7 +75,13 @@ class Mapper {
 	 * @param Dispatcher 	$dispatcher  
 	 * @param Manager  		$manager
 	 */
-	public function __construct(EntityMap $entityMap, DBAdapter $adapter, Dispatcher $dispatcher, Manager $manager)
+
+    /**
+     * @var Container
+     */
+    protected $container;
+
+	public function __construct(EntityMap $entityMap, DBAdapter $adapter, Dispatcher $dispatcher, Manager $manager, Container $container)
 	{
 		$this->entityMap = $entityMap;
 
@@ -85,6 +92,8 @@ class Mapper {
 		$this->manager = $manager;
 
 		$this->cache = new EntityCache($entityMap);
+
+        $this->container = $container;
 	}
 
 	/**
@@ -464,11 +473,13 @@ class Mapper {
 			throw new MappingException("Tried to instantiate a non-existing Entity class : $className");
 		}
 
-		$prototype = unserialize(sprintf('O:%d:"%s":0:{}',
+		/*$prototype = unserialize(sprintf('O:%d:"%s":0:{}',
 			strlen($className),
             			$className
          			)
         		);
+*/
+        $prototype = $this->container->make($className);
 		return $prototype;
 	}
 	
