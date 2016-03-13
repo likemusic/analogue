@@ -68,7 +68,8 @@ class EntityMap {
 	 * 
 	 * @var array
 	 */
-	private $relationships = null;
+	//private $relationships = null;
+	protected $relationships = null;
 
 	/**
 	 * Relationships that should be treated as collection.
@@ -166,7 +167,8 @@ class EntityMap {
 	 * 
 	 * @var \Analogue\ORM\System\Manager
 	 */
-	private $manager;
+	//private $manager;
+	protected $manager;//for serialization
 
     protected $manyClasses = ['BelongsToMany', 'HasMany', 'HasManyThrough',
         'MorphMany', 'MorphToMany'];
@@ -189,6 +191,7 @@ class EntityMap {
             'class',
             'embeddables',
 #private    'relationships',
+			//'relationships',
 #private    'manyRelations',
 #private           'singleRelations',
             'dynamicRelationships',
@@ -203,6 +206,7 @@ class EntityMap {
             'deletedAtColumn',
             'dateFormat',
 #private    'manager',
+			//'manager',
             'manyClasses',
             'singleClasses'
         ];

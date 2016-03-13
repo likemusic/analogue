@@ -47,12 +47,17 @@ class Repository {
     public function __sleep()
     {
         $Fields = get_object_vars($this);
-        return [
-            'ItemClassName',
-            'VirtualRootCategoryId',
-            'MappedClassName'
-            #'mapper'
-        ];
+        unset($Fields['mapper']);
+
+		$ret = array_keys($Fields);
+		/*return [
+			'ItemClassName',
+			#'VirtualRootCategoryId',
+			#'MappedClassName'
+			#'mapper'
+		];*/
+
+        return $ret;
     }
 
     public function __wakeup()
