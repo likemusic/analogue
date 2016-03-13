@@ -61,7 +61,7 @@ class CollectionProxy extends Proxy implements ArrayAccess, Arrayable, Countable
 
 	protected function loadOnce()
 	{
-		$this->loadedCollection = $this->load();
+        if(!$this->loaded) $this->loadedCollection = $this->load();
 
 		foreach($this->addedItems as $entity)
 		{
