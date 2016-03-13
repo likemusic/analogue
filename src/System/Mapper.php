@@ -96,7 +96,25 @@ class Mapper {
         $this->container = $container;
 	}
 
-	/**
+/*    public function __sleep()
+    {
+        $Fields = get_object_vars($this);
+        #print_r(array_keys($Fields));
+        $ret = [
+#closure            'manager',
+            'entityMap',
+#PDO             'adapter',
+#closure            'dispatcher',
+            'cache',
+            'globalScopes',
+            'customCommands',
+#closure            'container'
+        ];
+        return $ret;
+    }
+*/
+
+    /**
 	 * Persist an entity or an entity collection into the database
 	 * 
 	 * @param  Mappable|Collection $entity

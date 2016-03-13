@@ -16,6 +16,7 @@ class Repository {
 	 */
 	protected $mapper;
 
+    protected $MappedClassName;
 	/**
 	 * To build a repository, either provide :
 	 * 
@@ -39,7 +40,25 @@ class Repository {
 			$this->mapper = $mapper;
 		}
 		else new InvalidArgumentException('Repository class constuctor need a valid Mapper or Mappable object.');
-	}
+
+        $this->MappedClassName = $this->mapper->getEntityMap()->getClass();
+    }
+
+    public function __sleep()
+    {
+        $Fields = get_object_vars($this);
+        return [
+            'ItemClassName',
+            'VirtualRootCategoryId',
+            'MappedClassName'
+            #'mapper'
+        ];
+    }
+
+    public function __wakeup()
+    {
+        $this->mapper = Manager::getMapper($this->MappedClassName);
+    }
 
 	/**
 	 * Return all Entities from database

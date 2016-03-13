@@ -175,6 +175,39 @@ class EntityMap {
     protected $singleClasses = ['BelongsTo', 'HasOne', 'MorphOne','MorphTo'];
 
 
+    public function __sleep()
+    {
+        $Fields = get_object_vars($this);
+        //print_r(array_keys($Fields));
+        $ret = [
+#in childs  'UseDisabledScope',
+            'with',
+            'driver',
+            'connection',
+            'table',
+            'primaryKey',
+            'class',
+            'embeddables',
+#private    'relationships',
+#private    'manyRelations',
+#private           'singleRelations',
+            'dynamicRelationships',
+
+            'perPage',
+            'morphClass',
+            'timestamps',
+            'createdAtColumn',
+            'updatedAtColumn',
+
+            'softDeletes',
+            'deletedAtColumn',
+            'dateFormat',
+#private    'manager',
+            'manyClasses',
+            'singleClasses'
+        ];
+        return $ret;
+    }
 
     /**
 	 * Set the Manager that will be used for relationship's mapper instantiations.
@@ -955,7 +988,7 @@ class EntityMap {
         $parameters = $args;
         $masterEntity = array_shift($args);
         //TODO: refactor
-        if(!in_array($relation,$this->relationships))  throw new Exception('Invalid function or member call!');
+        if(!in_array($relation,$this->relationships)) throw new Exception('Invalid function or member call!');
 
         //$relationObject = $this->$relation($masterEntity);
         $relationObject = call_user_func_array(array($this,$relation) , $parameters);
