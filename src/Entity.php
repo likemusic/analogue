@@ -17,19 +17,63 @@ class Entity extends ValueObject implements Mappable, ArrayAccess, Jsonable, Jso
 	 */
 	protected $hidden = [];
 
-	/**
+    /**
+     * The cache of the mutated attributes for each class.
+     *
+     * @var array
+     */
+    protected static $mutatorCache = [];
+
+    /**
+     * Indicates whether attributes are snake cased on arrays.
+     *
+     * @var bool
+     */
+    public static $snakeAttributes = true;
+
+    public function __construct()
+    {
+        $class = get_class($this);
+
+        if (! isset(static::$mutatorCache[$class])) {
+            static::cacheMutatedAttributes($class);
+        }
+    }
+
+    public static function cacheMutatedAttributes($class)
+    {
+        $mutatedAttributes = [];
+
+        // Here we will extract all of the mutated attributes so that we can quickly
+        // spin through them after we export models to their array form, which we
+        // need to be fast. This'll let us know the attributes that can mutate.
+        foreach (get_class_methods($class) as $method) {
+            if (strpos($method, 'Attribute') !== false &&
+                preg_match('/^get(.+)Attribute$/', $method, $matches)) {
+                /*if (static::$snakeAttributes) {
+                    $matches[1] = Str::snake($matches[1]);
+                }*/
+
+                $mutatedAttributes[] = lcfirst($matches[1]);
+            }
+        }
+
+        static::$mutatorCache[$class] = $mutatedAttributes;
+    }
+
+    /**
 	 * Return the entity's attribute 
 	 * @param  string $key 
 	 * @return mixed
 	 */
 	public function __get($key)
 	{
-		if ($this->hasGetMutator($key))
+		/*if ($this->hasGetMutator($key))
 		{
 			$method = 'get'.$this->getMutatorMethod($key);
 
 			return $this->$method($this->attributes[$key]);
-		}
+		}*/
 
         /*if ($this->attributes[$key] instanceof EntityProxy)
 		{
@@ -76,7 +120,8 @@ class Entity extends ValueObject implements Mappable, ArrayAccess, Jsonable, Jso
      */
     protected function hasGetMutator($key)
     {
-    	return method_exists($this, 'get'.$this->getMutatorMethod($key)) ? true : false;
+    	//return method_exists($this, 'get'.$this->getMutatorMethod($key)) ? true : false;
+        return in_array($key, static::$mutatorCache[get_class($this)]);
     }
 
     /**
